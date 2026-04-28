@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 export default function BuyTicket() {
   const [searchQuery, setSearchQuery] = useState('');
-  
+
   const allRoutes = [
     { id: '1', name: 'Downtown Express', price: 25.00, type: 'Bus' },
     { id: '2', name: 'Airport Link', price: 60.00, type: 'Train' },
@@ -13,14 +13,14 @@ export default function BuyTicket() {
   ];
 
   // Logic to filter the list based on search input
-  const filteredRoutes = allRoutes.filter(route => 
+  const filteredRoutes = allRoutes.filter(route =>
     route.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Where to?</Text>
-      
+
       {/* Search Input Field */}
       <View style={styles.searchContainer}>
         <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
@@ -70,7 +70,7 @@ export default function BuyTicket() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f8f9fa', paddingHorizontal: 20, paddingTop: 20 },
   header: { fontSize: 24, fontWeight: 'bold', marginBottom: 15, color: '#333' },
-  
+
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
   },
   searchIcon: { marginRight: 10 },
   searchInput: { flex: 1, fontSize: 16 },
-  
+
   routeCard: {
     flexDirection: 'row',
     backgroundColor: 'white',
@@ -99,9 +99,9 @@ const styles = StyleSheet.create({
   routeType: { color: '#888', fontSize: 13 },
   priceContainer: { flexDirection: 'row', alignItems: 'center' },
   price: { fontSize: 16, fontWeight: 'bold', marginRight: 10, color: '#2f95dc' },
-  
+
   emptyText: { textAlign: 'center', marginTop: 50, color: '#888' },
-  
+
   footer: { paddingVertical: 20 },
   buyBtn: { backgroundColor: '#2f95dc', padding: 18, borderRadius: 15, alignItems: 'center' },
   buyBtnText: { color: 'white', fontSize: 16, fontWeight: 'bold' },

@@ -29,7 +29,7 @@ export default function History() {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Trip History</Text>
-      
+
       <SectionList
         sections={HISTORY_DATA}
         keyExtractor={(item) => item.id}

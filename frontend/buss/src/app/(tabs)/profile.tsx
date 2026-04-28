@@ -61,12 +61,12 @@ export default function Profile() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f8f9fa' },
   header: { alignItems: 'center', paddingVertical: 40, backgroundColor: 'white' },
-  avatarPlaceholder: { 
-    width: 100, 
-    height: 100, 
-    borderRadius: 50, 
-    backgroundColor: '#eee', 
-    justifyContent: 'center', 
+  avatarPlaceholder: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#eee',
+    justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 15
   },
@@ -82,13 +82,13 @@ const styles = StyleSheet.create({
   divider: { width: 1, height: '100%', backgroundColor: '#f0f0f0' },
 
   menuContainer: { marginTop: 20, backgroundColor: 'white', paddingHorizontal: 20 },
-  menuItem: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'center', 
-    paddingVertical: 18, 
-    borderBottomWidth: 1, 
-    borderBottomColor: '#f8f9fa' 
+  menuItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 18,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f8f9fa'
   },
   menuLeft: { flexDirection: 'row', alignItems: 'center' },
   menuLabel: { marginLeft: 15, fontSize: 16, color: '#333' },

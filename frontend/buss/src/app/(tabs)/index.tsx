@@ -3,7 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 export default function Home() {
   // Mock data - eventually this will come from your MariaDB API
-  const balance = "450.00"; 
+  const balance = "450.00";
   const recentTrips = [
     { id: '1', route: 'Line 04 - Downtown', date: 'Today, 08:30 AM', price: '-25.00' },
     { id: '2', route: 'Line 12 - Airport', date: 'Yesterday, 05:15 PM', price: '-60.00' },
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   balanceLabel: { color: 'white', fontSize: 14, opacity: 0.8 },
   balanceAmount: { color: 'white', fontSize: 36, fontWeight: 'bold' },
   cardNumber: { color: 'white', letterSpacing: 2, opacity: 0.8 },
-  
+
   actionRow: { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 30 },
   actionBtn: { alignItems: 'center', backgroundColor: 'white', padding: 15, borderRadius: 15, width: '45%', elevation: 2 },
   actionText: { marginTop: 8, fontWeight: '600', color: '#333' },
