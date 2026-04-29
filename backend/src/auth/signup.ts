@@ -4,7 +4,6 @@ import db from "../app/db";
 import { sign } from "jsonwebtoken";
 
 const secret = "hahuhi";
-
 const signupRoute = Router();
 
 signupRoute.post("/", async (req, res) => {
@@ -34,7 +33,7 @@ signupRoute.post("/", async (req, res) => {
     // 3. Commit the changes to the DB
     await trx.commit();
 
-    const token = sign({ id: passengerId }, secret);
+    const token = sign({ PassengerID: passengerId }, secret);
 
     // Send response ONLY after everything is confirmed
     res.json({ token });

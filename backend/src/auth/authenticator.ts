@@ -14,11 +14,11 @@ const authenticator = async (
     return res.status(401).json({ error: "No token provided" });
   }
   try {
-    const decoded = verify(token, "hahuhi") as any;
+    const decoded = verify(token, "hahuhi") as { PassengerID: number };
 
     // IMPORTANT: you must await this database call
     const user = await db("PASSENGER")
-      .where({ PassengerID: decoded.PassengersID }) // filter by a specific key, not the whole payload
+      .where({ PassengerID: decoded.PassengerID }) // filter by a specific key, not the whole payload
       .first();
 
     if (!user) {
@@ -29,6 +29,7 @@ const authenticator = async (
     (req as any).user = user;
     next();
   } catch (err) {
+    console.error(err);
     return res.status(403).json({ error: "Invalid or expired token" });
   }
 };

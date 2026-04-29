@@ -10,7 +10,7 @@ loginRoute.post("/", async (req: Request, res: Response) => {
   if (user && (await compare(password, user.Password))) {
     console.log(user);
     const token = sign({ PassengerID: user.PassengerID }, "hahuhi");
-    res.send(token);
+    res.json({ token });
   } else {
     res.send("invalid credentials");
   }

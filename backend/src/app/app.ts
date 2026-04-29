@@ -2,13 +2,12 @@ import express, { Request, Response } from "express";
 import loginRoute from "../auth/login";
 import signupRoute from "../auth/signup";
 import walletRoute from "../routes/wallet";
+import userRoute from "../routes/user";
 const app = express();
 
 app.use(express.json());
 
-app.get("/", (req: Request, res: Response) => {
-  res.send(200);
-});
+app.use("/user", userRoute);
 app.use("/auth/login", loginRoute);
 app.use("/auth/signup", signupRoute);
 app.use("/wallet", walletRoute);
