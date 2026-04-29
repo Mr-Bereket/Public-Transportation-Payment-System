@@ -3,6 +3,7 @@ CREATE TABLE PASSENGER (
     PassengerID INT PRIMARY KEY AUTO_INCREMENT,
     Name VARCHAR(100),
     PhoneNumber VARCHAR(20),
+    Password VARCHAR(255),
     JoinDate DATE
 );
 

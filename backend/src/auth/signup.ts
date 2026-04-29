@@ -1,18 +1,19 @@
-const router = require("express").Router();
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
-const db = require("../app/db");
+import { hash } from "bcryptjs";
+import { Router } from "express";
+import db from "../app/db";
+import { sign } from "jsonwebtoken";
 
 const secret = "hahuhi";
 
+const router = Router();
 router.post("/", async (req, res) => {
   const { name, phone, pass } = req.body;
-  const hashedPass = await bcrypt.hash(pass, 10);
+  const hashedPass = await hash(pass, 10);
   await db("user")
     .insert({ Name: name, PhoneNumber: phone, Password: hashedPass })
     .then((data) => {
       console.log(data);
-      const token = jwt.sign({ PhoneNo: phone }, secret);
+      const token = sign({ PhoneNo: phone }, secret);
       res.send(token);
     })
     .catch((err) => {
@@ -23,4 +24,4 @@ router.post("/", async (req, res) => {
     });
 });
 
-module.exports = router;
+export default router;

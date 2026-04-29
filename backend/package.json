@@ -1,4 +1,10 @@
 {
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/app/app.ts",
+    "prestart": "npm run build"
+  },
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.4.2",
@@ -6,5 +12,12 @@
     "jsonwebtoken": "^9.0.3",
     "knex": "^3.2.9",
     "mysql2": "^3.22.3"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^25.6.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
   }
 }
