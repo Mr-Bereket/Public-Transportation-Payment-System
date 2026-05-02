@@ -1,3 +1,7 @@
+-- create database
+CREATE DATABASE IF NOT EXISTS PublicTransportDB;
+USE PublicTransportDB;
+
 -- 1. Core Entities (No FKs)
 CREATE TABLE IF NOT EXISTS PASSENGER (
     PassengerID INT PRIMARY KEY AUTO_INCREMENT,

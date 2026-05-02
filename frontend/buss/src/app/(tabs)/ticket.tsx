@@ -1,75 +1,194 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, FlatList, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Pressable, FlatList, TextInput, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { useTrips } from '../../contexts/TripsContext';
+import { Schedule } from '../../services/api';
 
 export default function BuyTicket() {
+  const router = useRouter();
+  const { schedules, schedulesLoading, fetchSchedules, fetchRouteTrips } = useTrips();
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedRoute, setSelectedRoute] = useState<number | null>(null);
+  const [trips, setTrips] = useState<any[]>([]);
+  const [tripsLoading, setTripsLoading] = useState(false);
 
-  const allRoutes = [
-    { id: '1', name: 'Downtown Express', price: 25.00, type: 'Bus' },
-    { id: '2', name: 'Airport Link', price: 60.00, type: 'Train' },
-    { id: '3', name: 'Suburban Circle', price: 15.00, type: 'Bus' },
-    { id: '4', name: 'University Shuttle', price: 10.00, type: 'Bus' },
-  ];
+  useEffect(() => {
+    loadSchedules();
+  }, []);
 
-  // Logic to filter the list based on search input
-  const filteredRoutes = allRoutes.filter(route =>
-    route.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const loadSchedules = async () => {
+    try {
+      await fetchSchedules();
+    } catch (error) {
+      Alert.alert('Error', 'Failed to load schedules');
+    }
+  };
+
+  const handleSelectRoute = async (routeId: number) => {
+    setSelectedRoute(routeId);
+    setTripsLoading(true);
+    try {
+      const tripData = await fetchRouteTrips(routeId);
+      setTrips(tripData);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to load trips for this route');
+    } finally {
+      setTripsLoading(false);
+    }
+  };
+
+  const handleSelectTrip = (tripInstanceId: number) => {
+    router.push({
+      pathname: '/trips/trip-details',
+      params: { tripInstanceId },
+    });
+  };
+
+  const filteredSchedules = schedules.filter(schedule =>
+    schedule.RouteName.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  if (!selectedRoute) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.header}>Where to?</Text>
+
+        {/* Search Input Field */}
+        <View style={styles.searchContainer}>
+          <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search routes..."
+            value={searchQuery}
+            onChangeText={(text) => setSearchQuery(text)}
+          />
+          {searchQuery.length > 0 && (
+            <Pressable onPress={() => setSearchQuery('')}>
+              <Ionicons name="close-circle" size={20} color="#888" />
+            </Pressable>
+          )}
+        </View>
+
+        {schedulesLoading ? (
+          <View style={styles.centerContainer}>
+            <ActivityIndicator size="large" color="#2f95dc" />
+          </View>
+        ) : (
+          <FlatList
+            data={filteredSchedules}
+            keyExtractor={(item) => item.ScheduleID.toString()}
+            ListEmptyComponent={<Text style={styles.emptyText}>No routes found</Text>}
+            renderItem={({ item }) => (
+              <Pressable
+                style={styles.routeCard}
+                onPress={() => handleSelectRoute(item.RouteID)}
+              >
+                <View style={styles.iconContainer}>
+                  <Ionicons name="bus" size={24} color="#2f95dc" />
+                </View>
+                <View style={styles.info}>
+                  <Text style={styles.routeName}>{item.RouteName}</Text>
+                  <Text style={styles.routeTime}>
+                    {item.DepartureTime} → {item.ArrivalTime}
+                  </Text>
+                  <Text style={styles.daysOfWeek}>{item.DaysOfWeek}</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#ccc" />
+              </Pressable>
+            )}
+          />
+        )}
+      </View>
+    );
+  }
+
+  // Show trips for selected route
+  const selectedSchedule = schedules.find(s => s.RouteID === selectedRoute);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Where to?</Text>
-
-      {/* Search Input Field */}
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search stations or lines..."
-          value={searchQuery}
-          onChangeText={(text) => setSearchQuery(text)}
-        />
-        {searchQuery.length > 0 && (
-          <Pressable onPress={() => setSearchQuery('')}>
-            <Ionicons name="close-circle" size={20} color="#888" />
-          </Pressable>
-        )}
-      </View>
-
-      <FlatList
-        data={filteredRoutes}
-        keyExtractor={(item) => item.id}
-        ListEmptyComponent={<Text style={styles.emptyText}>No routes found.</Text>}
-        renderItem={({ item }) => (
-          <Pressable style={styles.routeCard}>
-            <View style={styles.iconContainer}>
-              <Ionicons name={item.type === 'Bus' ? 'bus' : 'train'} size={24} color="#2f95dc" />
-            </View>
-            <View style={styles.info}>
-              <Text style={styles.routeName}>{item.name}</Text>
-              <Text style={styles.routeType}>{item.type}</Text>
-            </View>
-            <View style={styles.priceContainer}>
-              <Text style={styles.price}>${item.price.toFixed(2)}</Text>
-              <Ionicons name="chevron-forward" size={20} color="#ccc" />
-            </View>
-          </Pressable>
-        )}
-      />
-
-      <View style={styles.footer}>
-        <Pressable style={styles.buyBtn}>
-          <Text style={styles.buyBtnText}>Quick Purchase</Text>
+      {/* Back Button */}
+      <View style={styles.backHeader}>
+        <Pressable onPress={() => setSelectedRoute(null)}>
+          <Ionicons name="chevron-back" size={28} color="#2f95dc" />
         </Pressable>
+        <Text style={styles.backTitle}>{selectedSchedule?.RouteName}</Text>
+        <View style={{ width: 28 }} />
       </View>
+
+      <Text style={styles.subHeader}>Available Trips</Text>
+
+      {tripsLoading ? (
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color="#2f95dc" />
+        </View>
+      ) : trips.length > 0 ? (
+        <FlatList
+          data={trips}
+          keyExtractor={(item) => item.TripInstanceID.toString()}
+          renderItem={({ item }) => (
+            <Pressable
+              style={styles.tripCard}
+              onPress={() => handleSelectTrip(item.TripInstanceID)}
+            >
+              <View style={styles.tripTimeContainer}>
+                <Text style={styles.tripTime}>{item.ActualStartTime}</Text>
+                <View style={styles.tripDot} />
+                <Text style={styles.tripTime}>{item.ActualEndTime}</Text>
+              </View>
+
+              <View style={styles.tripDetailsContainer}>
+                <View>
+                  <Text style={styles.busType}>{item.BusType}</Text>
+                  <Text style={styles.plateNumber}>{item.PlateNumber}</Text>
+                </View>
+
+                <View style={styles.seatsContainer}>
+                  <Ionicons name="people" size={16} color="#888" />
+                  <Text style={styles.seatsText}>
+                    {item.availableSeats}/{item.Capacity} seats
+                  </Text>
+                </View>
+
+                <View style={[
+                  styles.statusBadge,
+                  item.availableSeats === 0 && styles.statusFull
+                ]}>
+                  <Text style={styles.statusText}>
+                    {item.availableSeats > 0 ? 'Available' : 'Full'}
+                  </Text>
+                </View>
+              </View>
+
+              <Ionicons name="chevron-forward" size={20} color="#ccc" />
+            </Pressable>
+          )}
+        />
+      ) : (
+        <View style={styles.centerContainer}>
+          <Ionicons name="calendar-clear-outline" size={50} color="#ccc" />
+          <Text style={styles.emptyText}>No trips available</Text>
+        </View>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8f9fa', paddingHorizontal: 20, paddingTop: 20 },
+  container: { flex: 1, backgroundColor: '#f8f9fa', paddingHorizontal: 20, paddingTop: 15 },
+  centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+
   header: { fontSize: 24, fontWeight: 'bold', marginBottom: 15, color: '#333' },
+  backHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+    paddingVertical: 10,
+  },
+  backTitle: { fontSize: 18, fontWeight: 'bold', color: '#333' },
+  subHeader: { fontSize: 16, fontWeight: '600', color: '#555', marginBottom: 15 },
 
   searchContainer: {
     flexDirection: 'row',
@@ -78,32 +197,52 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderRadius: 12,
     marginBottom: 20,
-    height: 50,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
   },
   searchIcon: { marginRight: 10 },
-  searchInput: { flex: 1, fontSize: 16 },
+  searchInput: { flex: 1, paddingVertical: 12, fontSize: 16 },
 
   routeCard: {
     flexDirection: 'row',
-    backgroundColor: 'white',
-    padding: 15,
-    borderRadius: 15,
     alignItems: 'center',
-    marginBottom: 12,
+    backgroundColor: 'white',
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    borderRadius: 12,
+    marginBottom: 10,
     elevation: 1,
   },
-  iconContainer: { backgroundColor: '#e1f0ff', padding: 10, borderRadius: 12, marginRight: 15 },
+  iconContainer: { width: 45, height: 45, borderRadius: 10, backgroundColor: '#f0f0f0', justifyContent: 'center', alignItems: 'center', marginRight: 12 },
   info: { flex: 1 },
-  routeName: { fontSize: 16, fontWeight: 'bold' },
-  routeType: { color: '#888', fontSize: 13 },
-  priceContainer: { flexDirection: 'row', alignItems: 'center' },
-  price: { fontSize: 16, fontWeight: 'bold', marginRight: 10, color: '#2f95dc' },
+  routeName: { fontSize: 16, fontWeight: '600', color: '#333' },
+  routeTime: { fontSize: 13, color: '#666', marginTop: 2 },
+  daysOfWeek: { fontSize: 12, color: '#999', marginTop: 2 },
 
-  emptyText: { textAlign: 'center', marginTop: 50, color: '#888' },
+  tripCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    paddingHorizontal: 15,
+    paddingVertical: 15,
+    borderRadius: 12,
+    marginBottom: 10,
+    elevation: 1,
+  },
+  tripTimeContainer: { alignItems: 'center', marginRight: 15, minWidth: 60 },
+  tripTime: { fontSize: 14, fontWeight: '600', color: '#2f95dc' },
+  tripDot: { width: 2, height: 2, backgroundColor: '#ccc', marginVertical: 4 },
 
-  footer: { paddingVertical: 20 },
-  buyBtn: { backgroundColor: '#2f95dc', padding: 18, borderRadius: 15, alignItems: 'center' },
-  buyBtnText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
+  tripDetailsContainer: { flex: 1, gap: 8 },
+  busType: { fontSize: 14, fontWeight: '600', color: '#333' },
+  plateNumber: { fontSize: 12, color: '#888' },
+
+  seatsContainer: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  seatsText: { fontSize: 12, color: '#666' },
+
+  statusBadge: { paddingHorizontal: 8, paddingVertical: 4, backgroundColor: '#e8f5e9', borderRadius: 6 },
+  statusFull: { backgroundColor: '#ffebee' },
+  statusText: { fontSize: 11, fontWeight: '600', color: '#2e7d32' },
+
+  emptyText: { fontSize: 16, color: '#888', marginTop: 15, textAlign: 'center' },
 });
-
