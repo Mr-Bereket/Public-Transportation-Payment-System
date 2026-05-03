@@ -44,7 +44,7 @@ export default function Login() {
             placeholder="phone" 
             value={phone} 
             onChangeText={setPhone}
-            keyboardType="phone-address"
+            keyboardType="phone-pad"
             autoCapitalize="none"
             editable={!loading}
           />
