@@ -1,8 +1,10 @@
 import { View, Text, StyleSheet, SectionList, Pressable, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'expo-router';
 import { useTrips } from '../../contexts/TripsContext';
 import { showAlert } from '../../services/alert';
+import React from 'react';
 
 interface BookingSection {
   title: string;
@@ -10,9 +12,17 @@ interface BookingSection {
 }
 
 export default function History() {
+  const router = useRouter();
   const { bookings, bookingsLoading, fetchMyBookings, cancelBooking } = useTrips();
   const [sections, setSections] = useState<BookingSection[]>([]);
   const [cancelling, setCancelling] = useState<number | null>(null);
+
+  const handleViewBookingDetails = (tripInstanceId: number) => {
+    router.push({
+      pathname: '/trips/trip-details',
+      params: { tripInstanceId, readonly: 'true' },
+    });
+  };
 
   useEffect(() => {
     loadBookings();
@@ -117,7 +127,7 @@ export default function History() {
         sections={sections}
         keyExtractor={(item) => item.TransactionID.toString()}
         renderItem={({ item }) => (
-          <View style={styles.item}>
+          <Pressable style={styles.item} onPress={() => handleViewBookingDetails(item.TripInstanceID)}>
             <View style={[styles.iconBg, { backgroundColor: item.BusType === 'Train' ? '#e1f0ff' : '#f0f0f0' }]}>
               <Ionicons name={item.BusType === 'Train' ? 'train' : 'bus'} size={20} color="#555" />
             </View>
@@ -144,7 +154,7 @@ export default function History() {
                 )}
               </Pressable>
             </View>
-          </View>
+          </Pressable>
         )}
         renderSectionHeader={({ section: { title } }) => (
           <Text style={styles.sectionHeader}>{title}</Text>
