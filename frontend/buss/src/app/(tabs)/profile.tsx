@@ -114,7 +114,10 @@ export default function Profile() {
           <Ionicons name="chevron-forward" size={18} color="#ccc" />
         </Pressable>
 
-        <Pressable style={styles.actionItem}>
+        <Pressable 
+          style={styles.actionItem}
+          onPress={() => router.push('/wallet/transactions')}
+        >
           <View style={styles.actionIcon}>
             <Ionicons name="receipt-outline" size={24} color="#2f95dc" />
           </View>

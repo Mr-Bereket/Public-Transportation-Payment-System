@@ -1,5 +1,5 @@
 // API Configuration
-export const API_BASE_URL = 'https://friendly-system-rq7495gvqqghxxv6-3000.app.github.dev';
+export const API_BASE_URL = 'https://transport-project-et27.loca.lt';
 
 export const API_ENDPOINTS = {
   // Auth

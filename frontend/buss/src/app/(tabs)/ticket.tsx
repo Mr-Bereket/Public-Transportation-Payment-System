@@ -46,6 +46,29 @@ export default function BuyTicket() {
     });
   };
 
+  const parseTripDateTime = (date: string, time: string) => {
+    const [year, month, day] = date.split('-').map(Number);
+    const [hours, minutes, seconds = 0] = time.split(':').map(Number);
+    return new Date(year, month - 1, day, hours, minutes, seconds);
+  };
+
+  const isTripDone = (trip: any) => {
+    const tripEnd = parseTripDateTime(trip.ActualDate, trip.ActualEndTime);
+    return tripEnd <= new Date();
+  };
+
+  const getTripStatusLabel = (trip: any) => {
+    if (isTripDone(trip)) return 'Done';
+    if (trip.availableSeats <= 0) return 'Full';
+    return 'Active';
+  };
+
+  const getTripStatusStyle = (trip: any) => {
+    if (isTripDone(trip)) return styles.statusDone;
+    if (trip.availableSeats <= 0) return styles.statusFull;
+    return styles.statusActive;
+  };
+
   const filteredSchedules = schedules.filter(schedule =>
     schedule.RouteName.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -154,10 +177,10 @@ export default function BuyTicket() {
 
                 <View style={[
                   styles.statusBadge,
-                  item.availableSeats === 0 && styles.statusFull
+                  getTripStatusStyle(item)
                 ]}>
-                  <Text style={styles.statusText}>
-                    {item.availableSeats > 0 ? 'Available' : 'Full'}
+                  <Text style={[styles.statusText, isTripDone(item) && styles.statusTextDone]}>
+                    {getTripStatusLabel(item)}
                   </Text>
                 </View>
               </View>
@@ -242,8 +265,11 @@ const styles = StyleSheet.create({
   seatsText: { fontSize: 12, color: '#666' },
 
   statusBadge: { paddingHorizontal: 8, paddingVertical: 4, backgroundColor: '#e8f5e9', borderRadius: 6 },
+  statusActive: { backgroundColor: '#e8f5e9' },
+  statusDone: { backgroundColor: '#ffe0e0' },
   statusFull: { backgroundColor: '#ffebee' },
   statusText: { fontSize: 11, fontWeight: '600', color: '#2e7d32' },
+  statusTextDone: { color: '#c62828' },
 
   emptyText: { fontSize: 16, color: '#888', marginTop: 15, textAlign: 'center' },
 });

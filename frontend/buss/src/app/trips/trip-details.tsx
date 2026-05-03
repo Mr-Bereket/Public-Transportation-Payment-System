@@ -9,12 +9,26 @@ import { showAlert } from '../../services/alert';
 
 export default function TripDetails() {
   const router = useRouter();
-  const { tripInstanceId } = useLocalSearchParams();
+  const { tripInstanceId, readonly: readonlyParam } = useLocalSearchParams();
+  const isReadOnly = readonlyParam === 'true';
   const { fetchTripDetails, buyTicket, wallet } = useTrips();
   const { user } = useAuth();
   const [trip, setTrip] = useState<TripDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
+
+  const parseTripEnd = (date: string, time: string) => {
+    const [year, month, day] = date.split('-').map(Number);
+    const [hours, minutes, seconds = 0] = time.split(':').map(Number);
+    return new Date(year, month - 1, day, hours, minutes, seconds);
+  };
+
+  const isTripDone = (tripData: TripDetail) => {
+    const tripEnd = parseTripEnd(tripData.ActualDate, tripData.ActualEndTime);
+    return tripEnd <= new Date();
+  };
+
+  const getTripStatusText = (tripData: TripDetail) => (isTripDone(tripData) ? 'Done' : 'Active');
 
   const formatMoney = (value: number) =>
     new Intl.NumberFormat('en-US', {
@@ -56,6 +70,16 @@ export default function TripDetails() {
 
     if (trip.availableSeats <= 0) {
       showAlert('Trip Full', 'This trip has no available seats');
+      return;
+    }
+
+    if (isReadOnly) {
+      showAlert('Read Only', 'This trip detail view is for reference only. Ticket purchase is disabled.');
+      return;
+    }
+
+    if (isTripDone(trip)) {
+      showAlert('Trip Completed', 'This trip has already finished. You cannot purchase a ticket.');
       return;
     }
 
@@ -140,6 +164,11 @@ export default function TripDetails() {
         <View style={styles.routeInfo}>
           <Text style={styles.routeName}>{trip.RouteID}</Text>
           <Text style={styles.busInfo}>{trip.BusType} • {trip.PlateNumber}</Text>
+          <View style={[styles.statusBadge, isTripDone(trip) ? styles.statusDone : styles.statusActive]}>
+            <Text style={[styles.statusText, isTripDone(trip) && styles.statusTextDone]}>
+              {getTripStatusText(trip)}
+            </Text>
+          </View>
         </View>
       </View>
 
@@ -192,26 +221,27 @@ export default function TripDetails() {
         </View>
       </View>
 
-      {/* Buy Button */}
-      <Pressable
-        style={[
-          styles.buyBtn,
-          (purchasing || trip.availableSeats === 0) && styles.buyBtnDisabled
-        ]}
-        onPress={handleBuyTicket}
-        disabled={purchasing || trip.availableSeats === 0}
-      >
-        {purchasing ? (
-          <ActivityIndicator color="white" />
-        ) : (
-          <>
-            <Ionicons name="ticket" size={20} color="white" />
-            <Text style={styles.buyBtnText}>
-              {trip.availableSeats > 0 ? 'Buy Ticket' : 'Trip Full'}
-            </Text>
-          </>
-        )}
-      </Pressable>
+      {!isReadOnly && (
+        <Pressable
+          style={[
+            styles.buyBtn,
+            (purchasing || trip.availableSeats === 0 || (trip && isTripDone(trip))) && styles.buyBtnDisabled
+          ]}
+          onPress={handleBuyTicket}
+          disabled={purchasing || trip.availableSeats === 0 || (trip && isTripDone(trip))}
+        >
+          {purchasing ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <>
+              <Ionicons name="ticket" size={20} color="white" />
+              <Text style={styles.buyBtnText}>
+                {isTripDone(trip) ? 'Trip Done' : trip.availableSeats > 0 ? 'Buy Ticket' : 'Trip Full'}
+              </Text>
+            </>
+          )}
+        </Pressable>
+      )}
     </ScrollView>
   );
 }
@@ -281,6 +311,11 @@ const styles = StyleSheet.create({
   availabilityBadge: { paddingHorizontal: 12, paddingVertical: 6, backgroundColor: '#e8f5e9', borderRadius: 8 },
   availabilityFull: { backgroundColor: '#ffebee' },
   availabilityText: { fontSize: 12, fontWeight: '600', color: '#2e7d32' },
+  statusBadge: { marginTop: 10, alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8 },
+  statusActive: { backgroundColor: '#e8f5e9' },
+  statusDone: { backgroundColor: '#ffe0e0' },
+  statusText: { fontSize: 12, fontWeight: '600', color: '#2e7d32' },
+  statusTextDone: { color: '#c62828' },
 
   driverCard: {
     marginHorizontal: 20,
