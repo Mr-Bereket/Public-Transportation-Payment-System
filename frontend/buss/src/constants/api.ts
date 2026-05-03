@@ -1,10 +1,10 @@
 // API Configuration
-export const API_BASE_URL = 'https://friendly-system-rq7495gvqqghxxv6-3000.app.github.dev/';
+export const API_BASE_URL = 'https://friendly-system-rq7495gvqqghxxv6-3000.app.github.dev';
 
 export const API_ENDPOINTS = {
   // Auth
   LOGIN: '/auth/login',
-  SIGNUP: API_BASE_URL + '/auth/signup',
+  SIGNUP:'/auth/signup',
 
   // User
   GET_USER: '/user/me',

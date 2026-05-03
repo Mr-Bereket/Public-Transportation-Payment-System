@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import loginRoute from "../auth/login";
 import signupRoute from "../auth/signup";
 import walletRoute from "../routes/wallet";
@@ -11,6 +12,7 @@ dotenv.config({
   
 });
 
+app.use(cors());
 app.use(express.json());
 
 app.use("/user", userRoute);

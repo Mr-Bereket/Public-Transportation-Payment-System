@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTrips } from '../../contexts/TripsContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -62,7 +62,7 @@ export default function Home() {
           <Ionicons name="wifi" size={24} color="white" style={{ transform: [{ rotate: '90deg' }] }} />
         </View>
         <Text style={styles.balanceLabel}>Current Balance</Text>
-        <Text style={styles.balanceAmount}>${wallet?.balance?.toFixed(2) || '0.00'}</Text>
+        <Text style={styles.balanceAmount}>${wallet?.balance || '0.00'}</Text>
         <Text style={styles.cardNumber}>**** **** **** {wallet?.card_id?.slice(-4) || '0000'}</Text>
       </View>
 
@@ -101,7 +101,7 @@ export default function Home() {
                   {new Date(booking.ActualDate).toLocaleDateString()} {booking.ActualStartTime}
                 </Text>
               </View>
-              <Text style={styles.bookingPrice}>-${booking.Amount.toFixed(2)}</Text>
+              <Text style={styles.bookingPrice}>-${booking.Amount}</Text>
             </View>
           ))
         ) : (

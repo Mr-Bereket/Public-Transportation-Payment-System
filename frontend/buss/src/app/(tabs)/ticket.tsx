@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, FlatList, TextInput, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, Pressable, FlatList, TextInput, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useTrips } from '../../contexts/TripsContext';
 import { Schedule } from '../../services/api';
+import { showAlert } from '../../services/alert';
 
 export default function BuyTicket() {
   const router = useRouter();
@@ -21,7 +22,7 @@ export default function BuyTicket() {
     try {
       await fetchSchedules();
     } catch (error) {
-      Alert.alert('Error', 'Failed to load schedules');
+      showAlert('Error', 'Failed to load schedules');
     }
   };
 
@@ -32,7 +33,7 @@ export default function BuyTicket() {
       const tripData = await fetchRouteTrips(routeId);
       setTrips(tripData);
     } catch (error) {
-      Alert.alert('Error', 'Failed to load trips for this route');
+      showAlert('Error', 'Failed to load trips for this route');
     } finally {
       setTripsLoading(false);
     }

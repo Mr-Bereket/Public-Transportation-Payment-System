@@ -1,13 +1,12 @@
 import { API_BASE_URL, API_ENDPOINTS } from '../constants/api';
 
 export interface LoginRequest {
-  email: string;
+  phone: string;
   password: string;
 }
 
 export interface SignupRequest {
   name: string;
-  email: string;
   phone: string;
   password: string;
 }
@@ -135,12 +134,12 @@ class APIService {
   }
 
   // Auth APIs
-  async login(email: string, password: string): Promise<{ token: string; user: User }> {
-    return this.request(API_ENDPOINTS.LOGIN, 'POST', { email, password });
+  async login(phone: string, password: string): Promise<{ token: string; user: User }> {
+    return this.request(API_ENDPOINTS.LOGIN, 'POST', { phone, password });
   }
 
-  async signup(name: string, email: string, phone: string, password: string): Promise<{ token: string; user: User }> {
-    return this.request(API_ENDPOINTS.SIGNUP, 'POST', { name, email, phone, password });
+  async signup(name: string, phone: string, password: string): Promise<{ token: string; user: User }> {
+    return this.request(API_ENDPOINTS.SIGNUP, 'POST', { name, phone, password });
   }
 
   // User APIs

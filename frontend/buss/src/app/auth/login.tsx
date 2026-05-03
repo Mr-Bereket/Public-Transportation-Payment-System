@@ -1,27 +1,28 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Pressable, KeyboardAvoidingView, Platform, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Pressable, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
+import { showAlert } from '../../services/alert';
 
 export default function Login() {
   const router = useRouter();
   const { login, loading } = useAuth();
-  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert('Validation Error', 'Please enter both email and password');
+    if (!phone || !password) {
+      showAlert('Validation Error', 'Please enter both phone and password');
       return;
     }
 
     try {
-      await login(email, password);
+      await login(phone, password);
       router.replace('/(tabs)');
     } catch (error: any) {
-      Alert.alert('Login Failed', error.message || 'Invalid credentials');
+      showAlert('Login Failed', error.message || 'Invalid credentials');
     }
   };
 
@@ -40,10 +41,10 @@ export default function Login() {
         <View style={styles.inputGroup}>
           <TextInput 
             style={styles.input} 
-            placeholder="Email" 
-            value={email} 
-            onChangeText={setEmail}
-            keyboardType="email-address"
+            placeholder="phone" 
+            value={phone} 
+            onChangeText={setPhone}
+            keyboardType="phone-address"
             autoCapitalize="none"
             editable={!loading}
           />

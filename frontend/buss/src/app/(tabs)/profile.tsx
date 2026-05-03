@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView, ActivityIndicator, Alert, TextInput, Modal } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView, ActivityIndicator, TextInput, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTrips } from '../../contexts/TripsContext';
+import { showAlert } from '../../services/alert';
 
 export default function Profile() {
   const router = useRouter();
@@ -15,7 +16,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(false);
 
   const handleLogout = () => {
-    Alert.alert('Logout', 'Are you sure you want to logout?', [
+    showAlert('Logout', 'Are you sure you want to logout?', [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Logout',
@@ -30,7 +31,7 @@ export default function Profile() {
 
   const handleEditProfile = async () => {
     if (!editName || !editPhone) {
-      Alert.alert('Validation Error', 'Please fill in all fields');
+      showAlert('Validation Error', 'Please fill in all fields');
       return;
     }
 
@@ -39,9 +40,9 @@ export default function Profile() {
       // Note: You would need to add updateUser to the useAuth hook
       // For now, just close the modal
       setEditModalVisible(false);
-      Alert.alert('Success', 'Profile updated successfully');
+      showAlert('Success', 'Profile updated successfully');
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to update profile');
+      showAlert('Error', error.message || 'Failed to update profile');
     } finally {
       setLoading(false);
     }
@@ -75,7 +76,7 @@ export default function Profile() {
         <View style={styles.walletCard}>
           <Ionicons name="wallet" size={24} color="#2f95dc" />
           <Text style={styles.walletLabel}>Wallet Balance</Text>
-          <Text style={styles.walletAmount}>${wallet?.balance?.toFixed(2) || '0.00'}</Text>
+          <Text style={styles.walletAmount}>${wallet?.balance != null ? wallet.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}</Text>
         </View>
         <View style={styles.walletCard}>
           <Ionicons name="calendar" size={24} color="#27ae60" />

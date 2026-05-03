@@ -1,7 +1,8 @@
-import { View, Text, StyleSheet, SectionList, Pressable, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, SectionList, Pressable, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { useTrips } from '../../contexts/TripsContext';
+import { showAlert } from '../../services/alert';
 
 interface BookingSection {
   title: string;
@@ -21,7 +22,7 @@ export default function History() {
     try {
       await fetchMyBookings();
     } catch (error) {
-      Alert.alert('Error', 'Failed to load booking history');
+      showAlert('Error', 'Failed to load booking history');
     }
   };
 
@@ -63,7 +64,7 @@ export default function History() {
   }, [bookings]);
 
   const handleCancelBooking = (tripInstanceId: number, transactionId: number) => {
-    Alert.alert(
+    showAlert(
       'Cancel Booking',
       'Are you sure you want to cancel this booking? Your payment will be refunded.',
       [
@@ -74,9 +75,9 @@ export default function History() {
             setCancelling(tripInstanceId);
             try {
               await cancelBooking(tripInstanceId);
-              Alert.alert('Success', 'Booking cancelled and refunded');
+              showAlert('Success', 'Booking cancelled and refunded');
             } catch (error: any) {
-              Alert.alert('Error', error.message || 'Failed to cancel booking');
+              showAlert('Error', error.message || 'Failed to cancel booking');
             } finally {
               setCancelling(null);
             }
@@ -130,7 +131,7 @@ export default function History() {
               </Text>
             </View>
             <View style={styles.rightContainer}>
-              <Text style={styles.priceText}>-${item.Amount.toFixed(2)}</Text>
+              <Text style={styles.priceText}>-${new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(item.Amount)}</Text>
               <Pressable
                 style={styles.cancelBtn}
                 onPress={() => handleCancelBooking(item.TripInstanceID, item.TransactionID)}

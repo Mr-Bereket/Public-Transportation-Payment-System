@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Pressable, Alert, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Pressable, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useTrips } from '../../contexts/TripsContext';
+import { showAlert } from '../../services/alert';
 
 export default function Deposit() {
   const router = useRouter();
@@ -13,17 +14,17 @@ export default function Deposit() {
 
   const handleDeposit = async () => {
     if (!amount || parseFloat(amount) <= 0) {
-      Alert.alert('Invalid Amount', 'Please enter a valid amount');
+      showAlert('Invalid Amount', 'Please enter a valid amount');
       return;
     }
 
     try {
       await deposit(parseFloat(amount));
-      Alert.alert('Success', `$${amount} added to your wallet!`, [
+      showAlert('Success', `$${amount} added to your wallet!`, [
         { text: 'OK', onPress: () => router.back() },
       ]);
     } catch (error: any) {
-      Alert.alert('Deposit Failed', error.message || 'Could not process deposit');
+      showAlert('Deposit Failed', error.message || 'Could not process deposit');
     }
   };
 

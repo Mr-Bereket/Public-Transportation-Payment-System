@@ -7,8 +7,7 @@ const secret = "hahuhi";
 const signupRoute = Router();
 
 signupRoute.post("/", async (req, res) => {
-  const { name, phone, pass } = req.body;
-  const hashedPass = await hash(pass, 10);
+  const { name, phone, password } = req.body;
 
   // Use a transaction to ensure both happen or none happen
   const trx = await db.transaction();
@@ -18,7 +17,7 @@ signupRoute.post("/", async (req, res) => {
     const [passengerId] = await trx("PASSENGER").insert({
       Name: name,
       PhoneNumber: phone,
-      Password: hashedPass,
+      Password: password,
     });
 
     // 2. Insert Smart Card (linked to passengerId)

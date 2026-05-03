@@ -1,40 +1,40 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Pressable, KeyboardAvoidingView, Platform, Alert, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Pressable, KeyboardAvoidingView, Platform, ActivityIndicator, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
+import { showAlert } from '../../services/alert';
 
 export default function Signup() {
   const router = useRouter();
   const { signup, loading } = useAuth();
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSignup = async () => {
-    if (!name || !email || !phone || !password || !confirmPassword) {
-      Alert.alert('Validation Error', 'Please fill in all fields');
+    if (!name || !phone || !password || !confirmPassword) {
+      showAlert('Validation Error', 'Please fill in all fields');
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Validation Error', 'Passwords do not match');
+      showAlert('Validation Error', 'Passwords do not match');
       return;
     }
 
     if (password.length < 6) {
-      Alert.alert('Validation Error', 'Password must be at least 6 characters');
+      showAlert('Validation Error', 'Password must be at least 6 characters');
       return;
     }
 
     try {
-      await signup(name, email, phone, password);
+      await signup(name, phone, password);
       router.replace('/(tabs)');
     } catch (error: any) {
-      Alert.alert('Signup Failed', error.message || 'Registration failed');
+      showAlert('Signup Failed', error.message || 'Registration failed');
     }
   };
 
@@ -56,15 +56,6 @@ export default function Signup() {
             placeholder="Full Name" 
             value={name} 
             onChangeText={setName}
-            editable={!loading}
-          />
-          <TextInput 
-            style={styles.input} 
-            placeholder="Email" 
-            value={email} 
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
             editable={!loading}
           />
           <TextInput 

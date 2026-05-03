@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { ActivityIndicator, View } from 'react-native';
 import { useEffect } from 'react';
+import React from 'react';
 
 export default function TabLayout() {
   const { isLoggedIn, loading } = useAuth();

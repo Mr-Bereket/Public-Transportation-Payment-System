@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ActivityIndicator, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTrips } from '../../contexts/TripsContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { TripDetail } from '../../services/api';
+import { showAlert } from '../../services/alert';
 
 export default function TripDetails() {
   const router = useRouter();
@@ -14,6 +15,12 @@ export default function TripDetails() {
   const [trip, setTrip] = useState<TripDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
+
+  const formatMoney = (value: number) =>
+    new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
 
   useEffect(() => {
     loadTripDetails();
@@ -27,7 +34,7 @@ export default function TripDetails() {
         setTrip(tripData);
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to load trip details');
+      showAlert('Error', 'Failed to load trip details');
       router.back();
     } finally {
       setLoading(false);
@@ -39,22 +46,22 @@ export default function TripDetails() {
 
     const ticketPrice = 5.0;
     if (wallet.balance < ticketPrice) {
-      Alert.alert(
+      showAlert(
         'Insufficient Balance',
-        `You need $${ticketPrice} to buy a ticket. Your balance: $${wallet.balance.toFixed(2)}`,
+        `You need $${ticketPrice} to buy a ticket. Your balance: $${formatMoney(wallet.balance)}`,
         [{ text: 'Top Up', onPress: () => router.push('/wallet/deposit') }, { text: 'Cancel' }]
       );
       return;
     }
 
     if (trip.availableSeats <= 0) {
-      Alert.alert('Trip Full', 'This trip has no available seats');
+      showAlert('Trip Full', 'This trip has no available seats');
       return;
     }
 
-    Alert.alert(
+    showAlert(
       'Confirm Purchase',
-      `Purchase ticket for $${ticketPrice.toFixed(2)}?`,
+      `Purchase ticket for $${formatMoney(ticketPrice)}?`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -63,11 +70,11 @@ export default function TripDetails() {
             setPurchasing(true);
             try {
               await buyTicket(trip.TripInstanceID);
-              Alert.alert('Success', 'Ticket purchased successfully!', [
+              showAlert('Success', 'Ticket purchased successfully!', [
                 { text: 'OK', onPress: () => router.replace('/(tabs)/history') },
               ]);
             } catch (error: any) {
-              Alert.alert('Error', error.message || 'Failed to purchase ticket');
+              showAlert('Error', error.message || 'Failed to purchase ticket');
             } finally {
               setPurchasing(false);
             }
@@ -174,13 +181,13 @@ export default function TripDetails() {
       <View style={styles.priceSection}>
         <View style={styles.priceContainer}>
           <Text style={styles.priceLabel}>Ticket Price</Text>
-          <Text style={styles.priceValue}>${ticketPrice.toFixed(2)}</Text>
+          <Text style={styles.priceValue}>${formatMoney(ticketPrice)}</Text>
         </View>
 
         <View style={styles.walletInfo}>
           <Ionicons name="wallet" size={16} color="#666" />
           <Text style={styles.walletBalance}>
-            Wallet: ${wallet?.balance?.toFixed(2) || '0.00'}
+            Wallet: ${wallet?.balance != null ? formatMoney(wallet.balance) : '0.00'}
           </Text>
         </View>
       </View>
