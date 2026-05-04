@@ -4,9 +4,9 @@ USE PublicTransportDB;
 
 -- PASSENGER
 INSERT INTO PASSENGER (Name, PhoneNumber, Password, JoinDate) VALUES
-('Amanuel Bekele', '+251911000001', 'password123', '2024-07-01'),
-('Martha Alemu', '+251911000002', 'password456', '2024-08-15'),
-('Samuel Tadesse', '+251911000003', 'password789', '2024-09-10');
+('Bereket T', '0911000001', '123456', '2024-07-01'),
+('Hilina Z', '0911000002', '123456', '2024-08-15'),
+('Samuel Tadesse', '0911000003', 'password789', '2024-09-10');
 
 -- DRIVER
 INSERT INTO DRIVER (Name, LicenseNumber, Status, HireDate) VALUES
@@ -60,26 +60,26 @@ INSERT INTO ROUTE_STOPS (RouteID, StopID, StopOrder) VALUES
 
 -- TRIP_INSTANCE
 INSERT INTO TRIP_INSTANCE (ScheduleID, BusID, DriverID, ActualDate, ActualStartTime, ActualEndTime, DelayMinutes, PassengerCount) VALUES
-(1, 1, 1, '2025-04-01', '07:00:00', '07:45:00', 5, 42),
-(2, 2, 2, '2025-04-01', '08:30:00', '09:10:00', 0, 38),
-(3, 1, 1, '2025-04-02', '09:15:00', '09:55:00', 10, 45);
+(1, 1, 1, '2026-05-05', '07:00:00', '07:45:00', 5, 42),
+(2, 2, 2, '2026-05-05', '08:30:00', '09:10:00', 0, 38),
+(3, 1, 1, '2026-05-06', '09:15:00', '09:55:00', 10, 45);
 
 -- TAP_EVENT
 INSERT INTO TAP_EVENT (CardID, TripInstanceID, TimeStamp, TapType) VALUES
-('CARD10001', 1, '2025-04-01 07:05:00', 'on'),
-('CARD10002', 2, '2025-04-01 08:35:00', 'on'),
-('CARD10003', 3, '2025-04-02 09:20:00', 'on'),
-('CARD10001', 1, '2025-04-01 07:45:00', 'off');
+('CARD10001', 1, '2026-05-05 07:05:00', 'on'),
+('CARD10002', 2, '2026-05-05 08:35:00', 'on'),
+('CARD10003', 3, '2026-05-06 09:20:00', 'on'),
+('CARD10001', 1, '2026-05-05 07:45:00', 'off');
 
 -- TRANSACTION
 INSERT INTO `TRANSACTION` (CardID, TripInstanceID, Amount, TimeStamp, PaymentStatus, Type) VALUES
-('CARD10001', 1, 2.50, '2025-04-01 07:05:05', 'completed', 'fare'),
-('CARD10002', 2, 3.00, '2025-04-01 08:35:05', 'completed', 'fare'),
-('CARD10003', 3, 2.50, '2025-04-02 09:20:05', 'completed', 'fare'),
-('CARD10001', NULL, 20.00, '2025-03-31 12:00:00', 'completed', 'deposit');
+('CARD10001', 1, 2.50, '2026-05-05 07:05:05', 'completed', 'fare'),
+('CARD10002', 2, 3.00, '2026-05-05 08:35:05', 'completed', 'fare'),
+('CARD10003', 3, 2.50, '2026-05-06 09:20:05', 'completed', 'fare'),
+('CARD10001', NULL, 20.00, '2026-04-30 12:00:00', 'completed', 'deposit');
 
 -- BUS_TRACKING
 INSERT INTO BUS_TRACKING (TripInstanceID, Latitude, Longitude, TimeStamp, Status) VALUES
-(1, 9.0100, 38.7660, '2025-04-01 07:20:00', 'on_route'),
-(2, 9.0180, 38.7800, '2025-04-01 08:50:00', 'on_route'),
-(3, 9.0150, 38.7600, '2025-04-02 09:30:00', 'delayed');
+(1, 9.0100, 38.7660, '2026-05-05 07:20:00', 'on_route'),
+(2, 9.0180, 38.7800, '2026-05-05 08:50:00', 'on_route'),
+(3, 9.0150, 38.7600, '2026-05-06 09:30:00', 'delayed');

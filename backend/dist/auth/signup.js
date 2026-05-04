@@ -3,15 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const bcryptjs_1 = require("bcryptjs");
 const express_1 = require("express");
 const db_1 = __importDefault(require("../app/db"));
 const jsonwebtoken_1 = require("jsonwebtoken");
 const secret = "hahuhi";
 const signupRoute = (0, express_1.Router)();
 signupRoute.post("/", async (req, res) => {
-    const { name, phone, pass } = req.body;
-    const hashedPass = await (0, bcryptjs_1.hash)(pass, 10);
+    const { name, phone, password } = req.body;
     // Use a transaction to ensure both happen or none happen
     const trx = await db_1.default.transaction();
     try {
@@ -19,7 +17,7 @@ signupRoute.post("/", async (req, res) => {
         const [passengerId] = await trx("PASSENGER").insert({
             Name: name,
             PhoneNumber: phone,
-            Password: hashedPass,
+            Password: password,
         });
         // 2. Insert Smart Card (linked to passengerId)
         await trx("SMART_CARD").insert({
