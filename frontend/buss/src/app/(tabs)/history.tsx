@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, SectionList, Pressable, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'expo-router';
+import { useRouter, useNavigation } from 'expo-router';
 import { useTrips } from '../../contexts/TripsContext';
 import { showAlert } from '../../services/alert';
 import React from 'react';
@@ -13,9 +13,11 @@ interface BookingSection {
 
 export default function History() {
   const router = useRouter();
+  const navigation = useNavigation();
   const { bookings, bookingsLoading, fetchMyBookings, cancelBooking } = useTrips();
   const [sections, setSections] = useState<BookingSection[]>([]);
   const [cancelling, setCancelling] = useState<number | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   const handleViewBookingDetails = (tripInstanceId: number) => {
     router.push({
@@ -27,6 +29,39 @@ export default function History() {
   useEffect(() => {
     loadBookings();
   }, []);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await fetchMyBookings();
+      showAlert('Success', 'Data refreshed');
+    } catch (error) {
+      showAlert('Error', 'Failed to refresh data');
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Pressable
+          style={{ marginRight: 15 }}
+          onPress={handleRefresh}
+          disabled={refreshing}
+        >
+          {({ pressed }) => (
+            <Ionicons
+              name="refresh"
+              size={24}
+              color={refreshing ? '#888' : '#2f95dc'}
+              style={{ opacity: pressed ? 0.5 : 1 }}
+            />
+          )}
+        </Pressable>
+      ),
+    });
+  }, [navigation, refreshing]);
 
   const loadBookings = async () => {
     try {

@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable, FlatList, TextInput, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, useNavigation } from 'expo-router';
 import { useTrips } from '../../contexts/TripsContext';
 import { Schedule } from '../../services/api';
 import { showAlert } from '../../services/alert';
 
 export default function BuyTicket() {
   const router = useRouter();
+  const navigation = useNavigation();
   const { schedules, schedulesLoading, fetchSchedules, fetchRouteTrips } = useTrips();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRoute, setSelectedRoute] = useState<number | null>(null);
   const [trips, setTrips] = useState<any[]>([]);
   const [tripsLoading, setTripsLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     loadSchedules();
@@ -25,6 +27,43 @@ export default function BuyTicket() {
       showAlert('Error', 'Failed to load schedules');
     }
   };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await fetchSchedules();
+      if (selectedRoute) {
+        const tripData = await fetchRouteTrips(selectedRoute);
+        setTrips(tripData);
+      }
+      showAlert('Success', 'Data refreshed');
+    } catch (error) {
+      showAlert('Error', 'Failed to refresh data');
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Pressable
+          style={{ marginRight: 15 }}
+          onPress={handleRefresh}
+          disabled={refreshing}
+        >
+          {({ pressed }) => (
+            <Ionicons
+              name="refresh"
+              size={24}
+              color={refreshing ? '#888' : '#2f95dc'}
+              style={{ opacity: pressed ? 0.5 : 1 }}
+            />
+          )}
+        </Pressable>
+      ),
+    });
+  }, [navigation, refreshing, selectedRoute]);
 
   const handleSelectRoute = async (routeId: number) => {
     setSelectedRoute(routeId);

@@ -1,5 +1,5 @@
 // API Configuration
-export const API_BASE_URL = 'https://transport-project-et27.loca.lt';
+export const API_BASE_URL = 'https://opulent-goldfish-gjx49vqwg7v2wqp7-3000.app.github.dev';
 
 export const API_ENDPOINTS = {
   // Auth
