@@ -31,6 +31,8 @@ function Overview() {
     return <div>Loading...</div>
   }
 
+  const totalRevenue = Number(data.totalRevenue) || 0
+
   return (
     <div>
       <h1>Overview</h1>
@@ -49,7 +51,7 @@ function Overview() {
         </div>
         <div className="overview-card">
           <h3>Total Revenue</h3>
-          <div className="count">${(data.totalRevenue || 0).toFixed(2)}</div>
+          <div className="count">${totalRevenue.toFixed(2)}</div>
         </div>
       </div>
     </div>

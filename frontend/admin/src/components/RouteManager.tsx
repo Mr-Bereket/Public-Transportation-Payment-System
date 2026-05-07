@@ -9,6 +9,9 @@ interface Route {
 function RouteManager() {
   const [routes, setRoutes] = useState<Route[]>([])
   const [newRouteName, setNewRouteName] = useState('')
+  const [newArrivalTime, setNewArrivalTime] = useState('')
+  const [newDepartureTime, setNewDepartureTime] = useState('')
+  const [newDaysOfWeek, setNewDaysOfWeek] = useState('')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -30,11 +33,24 @@ function RouteManager() {
     if (!newRouteName.trim()) return
 
     try {
-      await axios.post('http://localhost:3000/admin/routes', { RouteName: newRouteName })
+      const payload: any = { RouteName: newRouteName }
+      if (newArrivalTime || newDepartureTime || newDaysOfWeek) {
+        payload.ArrivalTime = newArrivalTime
+        payload.DepartureTime = newDepartureTime
+        payload.DaysOfWeek = newDaysOfWeek
+      }
+
+      await axios.post('http://localhost:3000/admin/routes-with-schedule', payload)
       setNewRouteName('')
+      setNewArrivalTime('')
+      setNewDepartureTime('')
+      setNewDaysOfWeek('')
       fetchRoutes()
-    } catch (error) {
+      alert('Route created successfully!')
+    } catch (error: any) {
       console.error('Error adding route:', error)
+      const errorMessage = error.response?.data?.error || 'Error adding route'
+      alert(errorMessage)
     }
   }
 
@@ -69,6 +85,34 @@ function RouteManager() {
             value={newRouteName}
             onChange={(e) => setNewRouteName(e.target.value)}
             placeholder="Enter route name"
+          />
+        </div>
+        <p style={{ marginBottom: '0.5rem', color: '#555' }}>
+          Optionally add a schedule for this route now.
+        </p>
+        <div className="form-group">
+          <label>Departure Time:</label>
+          <input
+            type="time"
+            value={newDepartureTime}
+            onChange={(e) => setNewDepartureTime(e.target.value)}
+          />
+        </div>
+        <div className="form-group">
+          <label>Arrival Time:</label>
+          <input
+            type="time"
+            value={newArrivalTime}
+            onChange={(e) => setNewArrivalTime(e.target.value)}
+          />
+        </div>
+        <div className="form-group">
+          <label>Days of Week:</label>
+          <input
+            type="text"
+            value={newDaysOfWeek}
+            onChange={(e) => setNewDaysOfWeek(e.target.value)}
+            placeholder="e.g. Mon-Fri, Sat, Sun"
           />
         </div>
         <button className="btn btn-primary" onClick={addRoute}>

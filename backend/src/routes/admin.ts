@@ -17,13 +17,13 @@ adminRoute.get("/overview", async (req: Request, res: Response) => {
       .where("PaymentStatus", "completed")
       .sum("Amount as total_revenue");
     
-    const totalRevenue = revenueData?.total_revenue || 0;
+    const totalRevenue = Number(revenueData?.total_revenue) || 0;
 
     return res.json({
-      passengers: passengerCount.count,
-      routes: routeCount.count,
-      activeTrips: activeTripsCount.count,
-      totalRevenue: totalRevenue,
+      passengers: Number(passengerCount.count) || 0,
+      routes: Number(routeCount.count) || 0,
+      activeTrips: Number(activeTripsCount.count) || 0,
+      totalRevenue,
     });
   } catch (err) {
     console.error(err);
@@ -54,6 +54,39 @@ adminRoute.post("/routes", async (req: Request, res: Response) => {
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Could not create route" });
+  }
+});
+
+adminRoute.post("/routes-with-schedule", async (req: Request, res: Response) => {
+  try {
+    const { RouteName, ArrivalTime, DepartureTime, DaysOfWeek } = req.body;
+    if (!RouteName) {
+      return res.status(400).json({ error: "RouteName is required" });
+    }
+
+    if ((ArrivalTime || DepartureTime || DaysOfWeek) && (!ArrivalTime || !DepartureTime || !DaysOfWeek)) {
+      return res.status(400).json({ error: "ArrivalTime, DepartureTime, and DaysOfWeek are all required to create a schedule" });
+    }
+
+    const result = await db.transaction(async (trx) => {
+      const [routeId] = await trx("ROUTE").insert({ RouteName });
+
+      if (ArrivalTime && DepartureTime && DaysOfWeek) {
+        await trx("SCHEDULE").insert({
+          RouteID: routeId,
+          ArrivalTime,
+          DepartureTime,
+          DaysOfWeek,
+        });
+      }
+
+      return routeId;
+    });
+
+    return res.json({ RouteID: result, RouteName });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Could not create route with schedule" });
   }
 });
 
